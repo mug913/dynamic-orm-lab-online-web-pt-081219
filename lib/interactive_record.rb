@@ -7,7 +7,6 @@ class InteractiveRecord
     options.each do |property, value|
       self.send("#{property}=", value)
     end
-
   end
 
   def save
@@ -16,6 +15,10 @@ class InteractiveRecord
     @id = DB[:conn].execute("SELECT last_insert_rowid() FROM #{table_name_for_insert}")[0][0]
   end
 
+  def table_name_for_insert
+    self.class.table_name 
+  end
+  
   def values_for_insert
    values = []
    self.class.column_names.each do |col_name|
@@ -33,8 +36,6 @@ class InteractiveRecord
   end
 
   def self.column_names
-    DB[:conn].results_as_hash = true
-
     sql = "PRAGMA table_info('#{table_name}')"
 
     table_info = DB[:conn].execute(sql)
